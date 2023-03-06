@@ -1,0 +1,69 @@
+-- f. (*) Wybierz jedno z poniższych (korzystaj z tabeli Product, ProductSubCategory oraz
+-- ProductCategory):
+-- i. Wyświetl listę produktów, wraz z ceną katalogową, średnią ceną katalogową (ze
+-- wszystkich produktów), średnią ceną katalogową (z danej kategorii)
+-- ii. Wyświetl minimalną cenę katalogową względem nazwy kategorii (wiersze) oraz daty
+-- dodania produktu do sprzedaży (kolumny) 
+
+-- i.
+SELECT Production.Product.Name as Nazwa, Production.Product.ListPrice as Cena, 
+AVG(Production.Product.ListPrice) OVER(PARTITION BY NULL) as Średnia_Cena,
+AVG(Production.Product.ListPrice) OVER(PARTITION BY Production.ProductCategory.ProductCategoryID) AS Średnia_cena_w_kategorii
+FROM Production.Product 
+LEFT JOIN Production.ProductSubcategory ON Production.ProductSubcategory.ProductSubcategoryID = Production.Product.ProductSubcategoryID
+LEFT JOIN Production.ProductCategory ON Production.ProductSubcategory.ProductCategoryID = Production.ProductCategory.ProductCategoryID
+
+
+-- e. Grupowanie (korzystaj z tabeli Product, ProductSubCategory oraz ProductCategory):
+-- i. Wyświetl średnią cenę katalogową produktów oraz liczbę produktów w ramach
+-- każdej podkategorii (nazwa) oraz kategorii (nazwa)
+
+SELECT ProductCategory.Name AS Kategoria, ProductSubcategory.Name AS Podkategoria, AVG(ListPrice) AS Srednia_cena, COUNT(Product.Name) AS Liczba_produktow
+FROM Production.Product 
+LEFT JOIN Production.ProductSubcategory ON Production.Product.ProductSubcategoryID = Production.ProductSubcategory.ProductSubcategoryID
+LEFT JOIN Production.ProductCategory ON Production.ProductCategory.ProductCategoryID = Production.ProductSubcategory.ProductCategoryID
+GROUP BY ProductSubcategory.Name, ProductCategory.Name
+
+-- d. Złączenie (korzystaj z tabeli Product, ProductSubCategory oraz ProductCategory):
+-- i. Wyświetl nazwy wszystkich produktów, w wyniku potrzebna jest nazwa podkategorii
+-- i nazwa kategorii 
+
+SELECT Product.Name AS Nazwa, ProductCategory.Name AS Kategoria, ProductSubcategory.Name AS Podkategoria FROM Production.Product 
+LEFT JOIN Production.ProductSubcategory ON Production.Product.ProductSubcategoryID = Production.ProductSubcategory.ProductSubcategoryID
+LEFT JOIN Production.ProductCategory ON Production.ProductCategory.ProductCategoryID = Production.ProductSubcategory.ProductCategoryID
+
+-- c. Złączenie (korzystaj z tabeli Product oraz ProductSubCategory):
+-- i. Wyświetl nazwy produktów z nazwą podkategorii (subcategory)
+
+SELECT Product.Name AS Nazwa,  ProductSubcategory.Name AS Podkategoria FROM Production.Product 
+JOIN Production.ProductSubcategory ON Production.Product.ProductSubcategoryID = Production.ProductSubcategory.ProductSubcategoryID
+
+-- b. Filtrowanie (korzystaj z tabeli Product)
+-- i. Wyświetl nazwę i cenę katalogową wszystkich produktów o cenie katalogowej
+-- większej niż 10 i bez zdefiniowanego lub czerwonego koloru, posortowane rosnąco
+-- względem ceny katalogowej
+
+SELECT Product.Name AS Nazwa, Product.ListPrice AS Cena FROM Production.Product
+WHERE Product.ListPrice > 10 AND (Product.Color = Null OR Product.Color != 'Red')
+ORDER BY Product.ListPrice
+
+-- a. Podstawy (korzystaj z tabeli Product)
+-- i. Wyświetl wszystkie identyfikatory, nazwy, kolor, cenę katalogową oraz zysk (oblicz)
+-- produktów – uporządkuj wyniki alfabetycznie wg. nazwy. Dodatkowo wyświetl pełną
+-- nazwę (bez skrótu) klasy (class, H = High, M = Medium, L = Low) oraz nazwę typu
+-- (productline, R = Road, M = Mountain, T = Touring, S = Standard)
+
+SELECT Product.ProductID AS ID, Product.Name AS Nazwa, Product.Color AS Kolor, Product.ListPrice AS Cena, Product.ListPrice - Product.StandardCost AS Zysk, 
+CASE 
+    WHEN Product.Class = 'H' THEN 'High'
+    WHEN Product.Class = 'M' THEN 'Medium'
+    WHEN Product.Class = 'L' THEN 'Low'
+END AS Klasa,
+CASE 
+    WHEN Product.ProductLine = 'R' THEN 'Road'
+    WHEN Product.ProductLine = 'M' THEN 'Mountain'
+    WHEN Product.ProductLine = 'T' THEN 'Touring'
+    WHEN Product.ProductLine = 'S' THEN 'Standard'
+END AS Typ
+FROM Production.Product 
+ORDER BY Product.Name
