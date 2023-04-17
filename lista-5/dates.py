@@ -27,7 +27,7 @@ rates = clean_data(data)
 
 
 
-dates = pd.date_range(start='2022-01-01', end='2023-01-01')
+dates = pd.date_range(start='2022-03-01', end='2023-01-01')
 dates = pd.to_datetime(dates, format='%Y-%d-%m')
 dates = pd.DataFrame(dates)
 dates=dates.astype(str)
