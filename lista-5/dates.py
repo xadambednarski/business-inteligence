@@ -32,4 +32,3 @@ dates = dates.astype(str)
 df3 = pd.merge(rates, dates, how='right', left_on=[
                'effectiveDate'], right_on=0)
 df3.fillna(method='ffill')
-print(dates)
