@@ -21,15 +21,17 @@ def clean_data(df):
     df.drop(columns=['rates','table'], inplace=True)
     return df
 
+
 def visualize(df):
     sns.set_style("darkgrid")
-    sns.lineplot(data=df, x='effectiveDate', y='mid')
+    plot = sns.lineplot(data=df, x='effectiveDate', y='mid')
+    plot.set(xlabel='time', ylabel='rate',
+             title='Currency rate change in time')
     plt.show()
 
 
 currency = 'usd'
-dates = ('2022-01-01', '2023-01-01')
+dates = ('2022-01-03', '2023-01-03')
 data = import_data(currency, dates)
-print(data)
 exchange_rates_USD = clean_data(data)
 visualize(exchange_rates_USD)
